@@ -9,6 +9,10 @@ import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.command.SubCommand;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+
 public class TokenCommand extends Command {
     private transient final Logger logger = LogManager.getLogger();
 
@@ -41,7 +45,21 @@ public class TokenCommand extends Command {
                     logger.error("AuthId {} not found", args[1]);
                     return;
                 }
-                String token = server.authManager.newCheckServerToken(profile != null ? profile.getUUID().toString() : args[0], pair.name);
+
+                File tokenFolder = new File("tokens");
+                if (!tokenFolder.exists()) {
+                    tokenFolder.mkdirs();
+                }
+
+                String token = server.authManager.newCheckServerToken(
+                        profile != null
+                                ? profile.getUUID().toString()
+                                : args[0], pair.name);
+
+                try (FileOutputStream stream = new FileOutputStream(new File(tokenFolder, args[0] + ".txt"))) {
+                    stream.write(token.getBytes(StandardCharsets.UTF_8));
+                }
+
                 logger.info("Server token {} authId {}: {}", args[0], pair.name, token);
             }
         });
