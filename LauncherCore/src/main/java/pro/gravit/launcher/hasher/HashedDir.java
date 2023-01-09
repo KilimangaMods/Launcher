@@ -47,8 +47,8 @@ public final class HashedDir extends HashedEntry {
     }
 
 
-    public HashedDir(Path dir, FileNameMatcher matcher, boolean allowSymlinks, boolean digest) throws IOException {
-        IOHelper.walk(dir, new HashFileVisitor(dir, matcher, allowSymlinks, digest), true);
+    public HashedDir(Path dir, FileNameMatcher matcher, boolean allowSymlinks, boolean digest, String[] excludePatterns) throws IOException {
+        IOHelper.walk(dir, new HashFileVisitor(dir, matcher, allowSymlinks, digest, excludePatterns), true);
     }
 
     public Diff diff(HashedDir other, FileNameMatcher matcher) {
@@ -327,14 +327,16 @@ public final class HashedDir extends HashedEntry {
         private final boolean digest;
         private final Deque<String> path = new LinkedList<>();
         private final Deque<HashedDir> stack = new LinkedList<>();
+        private final String[] excludePatterns;
         // State
         private HashedDir current = HashedDir.this;
 
-        private HashFileVisitor(Path dir, FileNameMatcher matcher, boolean allowSymlinks, boolean digest) {
+        private HashFileVisitor(Path dir, FileNameMatcher matcher, boolean allowSymlinks, boolean digest, String[] excludePatterns) {
             this.dir = dir;
             this.matcher = matcher;
             this.allowSymlinks = allowSymlinks;
             this.digest = digest;
+            this.excludePatterns = excludePatterns;
         }
 
         @Override
@@ -377,6 +379,14 @@ public final class HashedDir extends HashedEntry {
             // Verify is not symlink
             if (!allowSymlinks && attrs.isSymbolicLink())
                 throw new SecurityException("Symlinks are not allowed");
+
+            // Check excluded
+            if (excludePatterns != null
+                    && Arrays.stream(excludePatterns)
+                    .anyMatch(file.getFileName().toString()::matches)) {
+                System.out.println("Skipped " + file);
+                return FileVisitResult.CONTINUE;
+            }
 
             // Add file (may be unhashed, if exclusion)
             path.add(IOHelper.getFileName(file));

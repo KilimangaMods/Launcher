@@ -93,7 +93,7 @@ public class UpdatesManager {
 
                 // Sync and sign update dir
                 logger.info("Syncing '{}' update dir", name);
-                HashedDir updateHDir = new HashedDir(updateDir, null, true, true);
+                HashedDir updateHDir = new HashedDir(updateDir, null, true, true, server.config.excludePatterns);
                 newUpdatesDirMap.put(name, updateHDir);
             }
         }
