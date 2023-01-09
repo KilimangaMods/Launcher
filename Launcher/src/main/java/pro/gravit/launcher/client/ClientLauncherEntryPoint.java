@@ -249,7 +249,7 @@ public class ClientLauncherEntryPoint {
         //    matcher = matcher.verifyOnly();
 
         // Hash directory and compare (ignore update-only matcher entries, it will break offline-mode)
-        HashedDir currentHDir = new HashedDir(dir, matcher, true, digest, null);
+        HashedDir currentHDir = new HashedDir(dir, matcher, true, digest);
         HashedDir.Diff diff = hdir.diff(currentHDir, matcher);
         if (!diff.mismatch.isEmpty() || (checkExtra && !diff.extra.isEmpty())) {
             diff.extra.walk(File.separator, (e, k, v) -> {

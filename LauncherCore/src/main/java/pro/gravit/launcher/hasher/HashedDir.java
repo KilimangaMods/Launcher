@@ -51,6 +51,10 @@ public final class HashedDir extends HashedEntry {
         IOHelper.walk(dir, new HashFileVisitor(dir, matcher, allowSymlinks, digest, excludePatterns), true);
     }
 
+    public HashedDir(Path dir, FileNameMatcher matcher, boolean allowSymlinks, boolean digest) throws IOException {
+        IOHelper.walk(dir, new HashFileVisitor(dir, matcher, allowSymlinks, digest), true);
+    }
+
     public Diff diff(HashedDir other, FileNameMatcher matcher) {
         HashedDir mismatch = sideDiff(other, matcher, new LinkedList<>(), true);
         HashedDir extra = other.sideDiff(this, matcher, new LinkedList<>(), false);
@@ -337,6 +341,14 @@ public final class HashedDir extends HashedEntry {
             this.allowSymlinks = allowSymlinks;
             this.digest = digest;
             this.excludePatterns = excludePatterns;
+        }
+
+        private HashFileVisitor(Path dir, FileNameMatcher matcher, boolean allowSymlinks, boolean digest) {
+            this.dir = dir;
+            this.matcher = matcher;
+            this.allowSymlinks = allowSymlinks;
+            this.digest = digest;
+            this.excludePatterns = null;
         }
 
         @Override
