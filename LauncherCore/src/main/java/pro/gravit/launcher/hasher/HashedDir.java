@@ -356,6 +356,14 @@ public final class HashedDir extends HashedEntry {
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            // Check excluded
+            if (excludePatterns != null
+                    && Arrays.stream(excludePatterns)
+                    .anyMatch(dir.getFileName().toString()::matches)) {
+                System.out.println("Skipped directory " + dir);
+                return FileVisitResult.SKIP_SUBTREE;
+            }
+
             FileVisitResult result = super.preVisitDirectory(dir, attrs);
             if (this.dir.equals(dir))
                 return result;
