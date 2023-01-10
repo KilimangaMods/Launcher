@@ -59,6 +59,7 @@ public class AsyncDownloader {
     public void downloadFile(URL url, Path target, long size) throws IOException {
         if (isClosed) throw new IOException("Download interrupted");
         URLConnection connection = url.openConnection();
+        connection.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
         if (isCertificatePinning) {
             HttpsURLConnection connection1 = (HttpsURLConnection) connection;
             try {
