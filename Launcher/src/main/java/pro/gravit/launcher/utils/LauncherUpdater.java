@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static pro.gravit.utils.helper.IOHelper.HTTP_TIMEOUT;
+import static pro.gravit.utils.helper.IOHelper.USER_AGENT;
+
 public class LauncherUpdater {
     @LauncherInject("launcher.certificatePinning")
     private static boolean isCertificatePinning;
@@ -46,6 +49,8 @@ public class LauncherUpdater {
         Path pathToLauncher = getLauncherPath();
         Path tempFile = Files.createTempFile("launcher-update-", ".jar");
         URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(HTTP_TIMEOUT);
+        connection.addRequestProperty("User-Agent", USER_AGENT);
         if (isCertificatePinning) {
             HttpsURLConnection connection1 = (HttpsURLConnection) connection;
             try {
